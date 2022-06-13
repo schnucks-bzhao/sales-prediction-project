@@ -12,3 +12,20 @@ from sklearn.model_selection import train_test_split
 import plotly.plotly as py
 import plotly.graph_objs as go
 from plotly.offline import init_notebook_mode, iplot
+
+BQ_SQL_puller <- function(sql_query, project = "schnucks-datalake-prod", numcon = 100L, pg_size = 50000L, verbose = FALSE, params) {
+    
+    s <- bq_project_query(project,
+                      query = sql_query,
+                      use_legacy_sql = F,
+                      max_pages = Inf,
+                      parameters = params) 
+
+    df_ret <- bq_table_download(s,
+                                page_size = pg_size,
+                                max_connections = numcon,
+                                quiet = FALSE)
+    return(df_ret)
+}
+
+bq_auth(use_oob = TRUE, scopes = c("https://www.googleapis.com/auth/bigquery"))
